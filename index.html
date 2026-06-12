@@ -21,18 +21,17 @@
     <h2>OBSBOT Tiny 2 Web Control</h2>
     <div id="status">🔴 ยังไม่ได้เชื่อมต่อกับ Local Bridge</div>
 
-    <div class="control-pad">
+   <div class="control-pad">
         <div class="empty"></div>
-        <button onclick="sendOsc('/obsbot/Webcam/General/PTZ/Set', ['up'])">⬆️</button>
+        <button onclick="sendOsc('/obsbot/Webcam/1/PTZ/Up', [1])">⬆️</button>
         <div class="empty"></div>
-        <button onclick="sendOsc('/obsbot/Webcam/General/PTZ/Set', ['left'])">⬅️</button>
-        <button onclick="sendOsc('/obsbot/Webcam/General/PTZ/Reset', [])">🔄</button>
-        <button onclick="sendOsc('/obsbot/Webcam/General/PTZ/Set', ['right'])">➡️</button>
+        <button onclick="sendOsc('/obsbot/Webcam/1/PTZ/Left', [1])">⬅️</button>
+        <button onclick="sendOsc('/obsbot/Webcam/1/PTZ/Reset', [1])">🔄</button>
+        <button onclick="sendOsc('/obsbot/Webcam/1/PTZ/Right', [1])">➡️</button>
         <div class="empty"></div>
-        <button onclick="sendOsc('/obsbot/Webcam/General/PTZ/Set', ['down'])">⬇️</button>
+        <button onclick="sendOsc('/obsbot/Webcam/1/PTZ/Down', [1])">⬇️</button>
         <div class="empty"></div>
     </div>
-
     <div class="presets">
         <button onclick="sendOsc('/obsbot/Webcam/General/Preset/1', [])">Preset 1</button>
         <button onclick="sendOsc('/obsbot/Webcam/General/Preset/2', [])">Preset 2</button>
