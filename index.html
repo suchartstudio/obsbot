@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OBSBOT Controller</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; text-align: center; background-color: #1e1e1e; color: white; margin-top: 50px; }
+        .control-pad { display: grid; grid-template-columns: repeat(3, 80px); gap: 10px; justify-content: center; margin-top: 20px; }
+        button { padding: 20px; font-size: 20px; cursor: pointer; border: none; border-radius: 10px; background-color: #3a3a3a; color: white; transition: 0.2s; }
+        button:hover { background-color: #555; }
+        button:active { background-color: #007bff; }
+        .empty { visibility: hidden; }
+        #status { margin-bottom: 20px; padding: 10px; border-radius: 5px; display: inline-block; background-color: #dc3545; }
+        .presets { margin-top: 30px; display: flex; justify-content: center; gap: 15px; }
+        .presets button { padding: 10px 20px; font-size: 16px; background-color: #28a745; }
+    </style>
+</head>
+<body>
+
+    <h2>OBSBOT Tiny 2 Web Control</h2>
+    <div id="status">🔴 ยังไม่ได้เชื่อมต่อกับ Local Bridge</div>
+
+    <div class="control-pad">
+        <div class="empty"></div>
+        <button onclick="sendOsc('/obsbot/Webcam/General/PTZ/Set', ['up'])">⬆️</button>
+        <div class="empty"></div>
+        <button onclick="sendOsc('/obsbot/Webcam/General/PTZ/Set', ['left'])">⬅️</button>
+        <button onclick="sendOsc('/obsbot/Webcam/General/PTZ/Reset', [])">🔄</button>
+        <button onclick="sendOsc('/obsbot/Webcam/General/PTZ/Set', ['right'])">➡️</button>
+        <div class="empty"></div>
+        <button onclick="sendOsc('/obsbot/Webcam/General/PTZ/Set', ['down'])">⬇️</button>
+        <div class="empty"></div>
+    </div>
+
+    <div class="presets">
+        <button onclick="sendOsc('/obsbot/Webcam/General/Preset/1', [])">Preset 1</button>
+        <button onclick="sendOsc('/obsbot/Webcam/General/Preset/2', [])">Preset 2</button>
+        <button onclick="sendOsc('/obsbot/Webcam/General/Preset/3', [])">Preset 3</button>
+    </div>
+
+    <script>
+        let ws;
+        const statusEl = document.getElementById('status');
+
+        function connect() {
+            // เชื่อมต่อไปที่ Local Bridge Server บนเครื่องที่รัน OBSBOT
+            ws = new WebSocket('ws://localhost:8080');
+
+            ws.onopen = () => {
+                statusEl.innerHTML = '🟢 เชื่อมต่อ Local Bridge สำเร็จ';
+                statusEl.style.backgroundColor = '#28a745';
+            };
+
+            ws.onclose = () => {
+                statusEl.innerHTML = '🔴 ขาดการเชื่อมต่อ (กำลังพยายามใหม่...)';
+                statusEl.style.backgroundColor = '#dc3545';
+                setTimeout(connect, 3000); // พยายามเชื่อมต่อใหม่ทุก 3 วินาที
+            };
+
+            ws.onerror = (err) => {
+                console.error('WebSocket Error:', err);
+            };
+        }
+
+        function sendOsc(address, args) {
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                const payload = JSON.stringify({ address: address, args: args });
+                ws.send(payload);
+                console.log('Sent:', payload);
+            } else {
+                alert("กรุณาเปิด Local Bridge Server ก่อนครับ!");
+            }
+        }
+
+        // เริ่มการเชื่อมต่อเมื่อโหลดหน้าเว็บ
+        connect();
+    </script>
+</body>
+</html>
