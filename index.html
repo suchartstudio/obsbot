@@ -6,14 +6,12 @@
     <title>OBSBOT Controller</title>
     <style>
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; text-align: center; background-color: #1e1e1e; color: white; margin-top: 50px; }
-        .control-pad { display: grid; grid-template-columns: repeat(3, 80px); gap: 10px; justify-content: center; margin-top: 20px; }
+        .control-pad { display: grid; grid-template-columns: repeat(3, 80px); gap: 10px; justify-content: center; margin-top: 20px; user-select: none; }
         button { padding: 20px; font-size: 20px; cursor: pointer; border: none; border-radius: 10px; background-color: #3a3a3a; color: white; transition: 0.2s; }
         button:hover { background-color: #555; }
         button:active { background-color: #007bff; }
         .empty { visibility: hidden; }
         #status { margin-bottom: 20px; padding: 10px; border-radius: 5px; display: inline-block; background-color: #dc3545; }
-        .presets { margin-top: 30px; display: flex; justify-content: center; gap: 15px; }
-        .presets button { padding: 10px 20px; font-size: 16px; background-color: #28a745; }
     </style>
 </head>
 <body>
@@ -21,21 +19,32 @@
     <h2>OBSBOT Tiny 2 Web Control</h2>
     <div id="status">🔴 ยังไม่ได้เชื่อมต่อกับ Local Bridge</div>
 
-   <div class="control-pad">
+    <div class="control-pad">
         <div class="empty"></div>
-        <button onclick="sendOsc('/obsbot/Webcam/1/PTZ/Up', [1])">⬆️</button>
+        <button 
+            onmousedown="sendOsc('/OBSBOT/WebCam/General/MoveUp', [1])" 
+            onmouseup="sendOsc('/OBSBOT/WebCam/General/MoveUp', [0])"
+            onmouseleave="sendOsc('/OBSBOT/WebCam/General/MoveUp', [0])">⬆️</button>
         <div class="empty"></div>
-        <button onclick="sendOsc('/obsbot/Webcam/1/PTZ/Left', [1])">⬅️</button>
-        <button onclick="sendOsc('/obsbot/Webcam/1/PTZ/Reset', [1])">🔄</button>
-        <button onclick="sendOsc('/obsbot/Webcam/1/PTZ/Right', [1])">➡️</button>
+        
+        <button 
+            onmousedown="sendOsc('/OBSBOT/WebCam/General/MoveLeft', [1])" 
+            onmouseup="sendOsc('/OBSBOT/WebCam/General/MoveLeft', [0])"
+            onmouseleave="sendOsc('/OBSBOT/WebCam/General/MoveLeft', [0])">⬅️</button>
+            
+        <button onclick="sendOsc('/OBSBOT/WebCam/General/ResetGimbal', [1])">🔄</button>
+        
+        <button 
+            onmousedown="sendOsc('/OBSBOT/WebCam/General/MoveRight', [1])" 
+            onmouseup="sendOsc('/OBSBOT/WebCam/General/MoveRight', [0])"
+            onmouseleave="sendOsc('/OBSBOT/WebCam/General/MoveRight', [0])">➡️</button>
+            
         <div class="empty"></div>
-        <button onclick="sendOsc('/obsbot/Webcam/1/PTZ/Down', [1])">⬇️</button>
+        <button 
+            onmousedown="sendOsc('/OBSBOT/WebCam/General/MoveDown', [1])" 
+            onmouseup="sendOsc('/OBSBOT/WebCam/General/MoveDown', [0])"
+            onmouseleave="sendOsc('/OBSBOT/WebCam/General/MoveDown', [0])">⬇️</button>
         <div class="empty"></div>
-    </div>
-    <div class="presets">
-        <button onclick="sendOsc('/obsbot/Webcam/General/Preset/1', [])">Preset 1</button>
-        <button onclick="sendOsc('/obsbot/Webcam/General/Preset/2', [])">Preset 2</button>
-        <button onclick="sendOsc('/obsbot/Webcam/General/Preset/3', [])">Preset 3</button>
     </div>
 
     <script>
@@ -43,7 +52,6 @@
         const statusEl = document.getElementById('status');
 
         function connect() {
-            // เชื่อมต่อไปที่ Local Bridge Server บนเครื่องที่รัน OBSBOT
             ws = new WebSocket('ws://localhost:8080');
 
             ws.onopen = () => {
@@ -54,12 +62,10 @@
             ws.onclose = () => {
                 statusEl.innerHTML = '🔴 ขาดการเชื่อมต่อ (กำลังพยายามใหม่...)';
                 statusEl.style.backgroundColor = '#dc3545';
-                setTimeout(connect, 3000); // พยายามเชื่อมต่อใหม่ทุก 3 วินาที
+                setTimeout(connect, 3000); 
             };
 
-            ws.onerror = (err) => {
-                console.error('WebSocket Error:', err);
-            };
+            ws.onerror = (err) => console.error('WebSocket Error:', err);
         }
 
         function sendOsc(address, args) {
@@ -67,12 +73,9 @@
                 const payload = JSON.stringify({ address: address, args: args });
                 ws.send(payload);
                 console.log('Sent:', payload);
-            } else {
-                alert("กรุณาเปิด Local Bridge Server ก่อนครับ!");
             }
         }
 
-        // เริ่มการเชื่อมต่อเมื่อโหลดหน้าเว็บ
         connect();
     </script>
 </body>
